@@ -19,8 +19,10 @@ resource "aws_iam_role" "task_execution" {
 
 resource "aws_iam_role_policy_attachment" "task_execution" {
   role       = aws_iam_role.task_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+
+data "aws_partition" "current" {}
 
 data "aws_iam_policy_document" "secrets_read" {
   statement {
