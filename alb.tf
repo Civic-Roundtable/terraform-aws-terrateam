@@ -36,10 +36,10 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = var.acm_certificate_arn != null ? "redirect" : "forward"
+    type = var.enable_https ? "redirect" : "forward"
 
     dynamic "redirect" {
-      for_each = var.acm_certificate_arn != null ? [1] : []
+      for_each = var.enable_https ? [1] : []
       content {
         port        = "443"
         protocol    = "HTTPS"
@@ -47,7 +47,7 @@ resource "aws_lb_listener" "http" {
       }
     }
 
-    target_group_arn = var.acm_certificate_arn == null ? aws_lb_target_group.this.arn : null
+    target_group_arn = var.enable_https ? null : aws_lb_target_group.this.arn
   }
 
   tags = var.tags
@@ -56,7 +56,7 @@ resource "aws_lb_listener" "http" {
 # --- HTTPS Listener (optional) ---
 
 resource "aws_lb_listener" "https" {
-  count = var.acm_certificate_arn != null ? 1 : 0
+  count = var.enable_https ? 1 : 0
 
   load_balancer_arn = aws_lb.this.arn
   port              = 443

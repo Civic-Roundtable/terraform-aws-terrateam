@@ -25,9 +25,15 @@ variable "domain" {
 }
 
 variable "acm_certificate_arn" {
-  description = "ARN of an ACM certificate for HTTPS. When set, an HTTPS listener on port 443 is created and HTTP redirects to HTTPS."
+  description = "ARN of an ACM certificate for HTTPS. Only used when enable_https is true."
   type        = string
   default     = null
+}
+
+variable "enable_https" {
+  description = "Create an HTTPS listener on port 443 (and redirect HTTP to it) using acm_certificate_arn. Kept as its own flag rather than inferred from acm_certificate_arn != null: when the certificate is created in the same apply as this module (e.g. from an ACM module whose output the caller passes in), its ARN is unknown at plan time, and Terraform can't use an unknown value to decide a resource's count - only a value that's statically known, like this flag, works there."
+  type        = bool
+  default     = false
 }
 
 variable "container_image" {

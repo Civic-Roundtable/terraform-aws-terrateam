@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "alb_ingress_http" {
 }
 
 resource "aws_security_group_rule" "alb_ingress_https" {
-  count = var.acm_certificate_arn != null ? 1 : 0
+  count = var.enable_https ? 1 : 0
 
   security_group_id = aws_security_group.alb.id
   type              = "ingress"
