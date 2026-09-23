@@ -117,6 +117,18 @@ variable "db_skip_final_snapshot" {
   default     = false
 }
 
+variable "kms_key_id" {
+  description = "KMS key ARN for encrypting the RDS instance's storage and Performance Insights data. Defaults to the AWS-managed key (alias/aws/rds) when not set - pass a customer-managed key's ARN to use one instead."
+  type        = string
+  default     = null
+}
+
+variable "log_retention_in_days" {
+  description = "CloudWatch Logs retention (days) for the ECS task's log group."
+  type        = number
+  default     = 30
+}
+
 variable "tags" {
   description = "Tags applied to all resources."
   type        = map(string)
