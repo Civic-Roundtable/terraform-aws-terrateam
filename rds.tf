@@ -110,18 +110,17 @@ resource "aws_cloudwatch_log_group" "rds_upgrade" {
 
 # Vanta requires retaining logs for at least 1 year. "RDSOSMetrics" is one log group shared by
 # every RDS instance with enhanced monitoring enabled in this account+region, not specific to
-# this instance - so it may already exist. The import block below only succeeds if it does; if
-# this is the first RDS instance in the account/region to ever enable enhanced monitoring, the
-# import has nothing to adopt and errors - remove the import block for that first apply (AWS
-# creates the log group automatically once monitoring starts) and add it back afterward.
+# this instance - so if some other, unrelated RDS instance in the same account/region already
+# has enhanced monitoring on, this resource will fail to create with "already exists". Terraform
+# import blocks are only valid in the root module, and this is a child module always consumed by
+# something else, so this can't self-heal that case the way a root module's own rds.tf could
+# (see e.g. tf-root-modules/production-gov/backend/rds.tf in the consuming repo, which has its
+# own RDSOSMetrics resource with its own import block) - a caller hitting that has to either
+# import it into this address themselves (module.<path>.aws_cloudwatch_log_group.rds_os_metrics)
+# or accept the log group's pre-existing (possibly shorter) retention by removing this resource.
 resource "aws_cloudwatch_log_group" "rds_os_metrics" {
   name              = "RDSOSMetrics"
   retention_in_days = 365
 
   depends_on = [aws_iam_role_policy_attachment.rds_enhanced_monitoring]
-}
-
-import {
-  id = "RDSOSMetrics"
-  to = aws_cloudwatch_log_group.rds_os_metrics
 }
