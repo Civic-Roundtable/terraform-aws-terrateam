@@ -117,6 +117,64 @@ variable "db_skip_final_snapshot" {
   default     = false
 }
 
+variable "kms_key_id" {
+  description = "KMS key ARN for encrypting the RDS instance's storage and Performance Insights data. Defaults to the AWS-managed key (alias/aws/rds) when not set - pass a customer-managed key's ARN to use one instead."
+  type        = string
+  default     = null
+}
+
+variable "log_retention_in_days" {
+  description = "CloudWatch Logs retention (days) for the ECS task's log group."
+  type        = number
+  default     = 30
+}
+
+variable "db_parameters" {
+  description = "Extra parameters for the RDS instance's parameter group. Defaults to none, matching the engine family's default parameter group."
+  type = list(object({
+    name         = string
+    value        = string
+    apply_method = optional(string, "immediate")
+  }))
+  default = []
+}
+
+variable "db_storage_type" {
+  description = "RDS storage type."
+  type        = string
+  default     = "gp2"
+}
+
+variable "db_enabled_cloudwatch_logs_exports" {
+  description = "RDS log types to export to CloudWatch Logs (e.g. [\"postgresql\", \"upgrade\"]). Defaults to none."
+  type        = list(string)
+  default     = []
+}
+
+variable "db_performance_insights_retention_period" {
+  description = "Retention period (days) for RDS Performance Insights data. AWS default is 7; pass 465 (or higher, in 31-day increments) to use \"advanced\" database_insights_mode."
+  type        = number
+  default     = 7
+}
+
+variable "db_monitoring_interval" {
+  description = "Granularity (seconds) for RDS Enhanced Monitoring metrics. 0 disables enhanced monitoring, which is the default - the IAM role enhanced monitoring needs is only created when this is nonzero."
+  type        = number
+  default     = 0
+}
+
+variable "db_database_insights_mode" {
+  description = "RDS Performance Insights mode: \"standard\" (default) or \"advanced\". \"advanced\" requires db_performance_insights_retention_period >= 465."
+  type        = string
+  default     = "standard"
+}
+
+variable "db_log_retention_in_days" {
+  description = "CloudWatch Logs retention (days) for the RDS-specific log groups this module precreates (postgresql/upgrade exports, and RDSOSMetrics when enhanced monitoring is on). Only applies to log groups actually created - i.e. exports listed in db_enabled_cloudwatch_logs_exports, and RDSOSMetrics only when db_monitoring_interval > 0."
+  type        = number
+  default     = 30
+}
+
 variable "tags" {
   description = "Tags applied to all resources."
   type        = map(string)
