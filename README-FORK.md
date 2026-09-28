@@ -12,6 +12,8 @@ used by [Civic-Roundtable/devops](https://github.com/Civic-Roundtable/devops)'s
   a variable defaulting to upstream's original behavior (unset `storage_type`, no CloudWatch log
   exports, monitoring off, `database_insights_mode = "standard"`, no extra parameter group
   entries) - the consuming repo's `terrateam.tf` passes the hardened values explicitly.
+- `alb_deletion_protection` variable for the ALB's `enable_deletion_protection` (Security Hub
+  ELB.6), defaulting to upstream's `false`; the consuming repo passes `true`.
 
 When bumping the pinned ref: diff the target upstream commit against this fork's base
 (`4e53bbb4`), re-apply the patches above on top if the files they touch changed, and re-check for

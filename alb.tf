@@ -4,7 +4,10 @@ resource "aws_lb" "this" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = var.public_subnet_ids
-  tags               = var.tags
+
+  enable_deletion_protection = var.alb_deletion_protection
+
+  tags = var.tags
 }
 
 resource "aws_lb_target_group" "this" {

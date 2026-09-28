@@ -96,6 +96,12 @@ variable "alb_ingress_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "alb_deletion_protection" {
+  description = "Enable deletion protection on the ALB. Defaults to false, matching upstream."
+  type        = bool
+  default     = false
+}
+
 variable "extra_environment" {
   description = "Additional environment variables for the Terrateam container."
   type = list(object({
