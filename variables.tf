@@ -84,6 +84,12 @@ variable "db_deletion_protection" {
   default     = true
 }
 
+variable "db_copy_tags_to_snapshot" {
+  description = "Copy the RDS instance's tags to its snapshots. Defaults to false, matching upstream."
+  type        = bool
+  default     = false
+}
+
 variable "db_backup_retention_period" {
   description = "Number of days to retain RDS automated backups."
   type        = number

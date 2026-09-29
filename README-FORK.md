@@ -14,6 +14,8 @@ used by [Civic-Roundtable/devops](https://github.com/Civic-Roundtable/devops)'s
   entries) - the consuming repo's `terrateam.tf` passes the hardened values explicitly.
 - `alb_deletion_protection` variable for the ALB's `enable_deletion_protection` (Security Hub
   ELB.6), defaulting to upstream's `false`; the consuming repo passes `true`.
+- `db_copy_tags_to_snapshot` variable for the RDS instance's `copy_tags_to_snapshot` (Security
+  Hub RDS.17), defaulting to upstream's `false`; the consuming repo passes `true`.
 
 When bumping the pinned ref: diff the target upstream commit against this fork's base
 (`4e53bbb4`), re-apply the patches above on top if the files they touch changed, and re-check for
