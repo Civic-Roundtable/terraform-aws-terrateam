@@ -14,6 +14,10 @@ used by [Civic-Roundtable/devops](https://github.com/Civic-Roundtable/devops)'s
   entries) - the consuming repo's `terrateam.tf` passes the hardened values explicitly.
 - `alb_deletion_protection` variable for the ALB's `enable_deletion_protection` (Security Hub
   ELB.6), defaulting to upstream's `false`; the consuming repo passes `true`.
+- `alb_drop_invalid_header_fields` (Security Hub ELB.4), `alb_access_logs_enabled`/`_bucket`/
+  `_prefix` (ELB.5), and `alb_http_listener` (turns off the port-80 listener and its ingress
+  rule, for HTTPS-only) - all defaulting to upstream's behavior; the consuming repo passes the
+  hardened values.
 - `db_copy_tags_to_snapshot` variable for the RDS instance's `copy_tags_to_snapshot` (Security
   Hub RDS.17), defaulting to upstream's `false`; the consuming repo passes `true`.
 

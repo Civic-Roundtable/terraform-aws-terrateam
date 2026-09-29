@@ -102,6 +102,36 @@ variable "alb_ingress_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "alb_drop_invalid_header_fields" {
+  description = "Have the ALB drop HTTP headers with invalid header fields instead of forwarding them. Defaults to false, matching upstream."
+  type        = bool
+  default     = false
+}
+
+variable "alb_access_logs_enabled" {
+  description = "Write ALB access logs to alb_access_logs_bucket. Defaults to false, matching upstream. Its own flag rather than inferred from alb_access_logs_bucket != null, for the same reason as enable_https: the bucket name may be unknown at plan time."
+  type        = bool
+  default     = false
+}
+
+variable "alb_access_logs_bucket" {
+  description = "S3 bucket for ALB access logs, used when alb_access_logs_enabled is true. Its policy must allow ELB log delivery before the ALB is updated, or AWS rejects the change."
+  type        = string
+  default     = null
+}
+
+variable "alb_access_logs_prefix" {
+  description = "Key prefix for ALB access logs in alb_access_logs_bucket."
+  type        = string
+  default     = null
+}
+
+variable "alb_http_listener" {
+  description = "Create the plain-HTTP listener on port 80 (a redirect to HTTPS when enable_https is true) and its security group rule. Defaults to true, matching upstream; set false to serve HTTPS only."
+  type        = bool
+  default     = true
+}
+
 variable "alb_deletion_protection" {
   description = "Enable deletion protection on the ALB. Defaults to false, matching upstream."
   type        = bool
