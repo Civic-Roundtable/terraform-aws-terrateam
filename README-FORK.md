@@ -18,6 +18,8 @@ used by [Civic-Roundtable/devops](https://github.com/Civic-Roundtable/devops)'s
   `_prefix` (ELB.5), and `alb_http_listener` (turns off the port-80 listener and its ingress
   rule, for HTTPS-only) - all defaulting to upstream's behavior; the consuming repo passes the
   hardened values.
+- `container_user` for the task definition's `user` (Security Hub ECS.20), defaulting to unset
+  like upstream; the consuming repo passes the image's non-root `terrat` user.
 - `db_copy_tags_to_snapshot` variable for the RDS instance's `copy_tags_to_snapshot` (Security
   Hub RDS.17), defaulting to upstream's `false`; the consuming repo passes `true`.
 

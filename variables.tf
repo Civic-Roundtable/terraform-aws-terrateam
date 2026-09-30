@@ -36,6 +36,12 @@ variable "enable_https" {
   default     = false
 }
 
+variable "container_user" {
+  description = "User the Terrateam container runs as (the task definition's `user`). Defaults to null, matching upstream: unset, so the image's own USER applies. Set it explicitly (e.g. \"terrat\", the image's non-root user) for Security Hub ECS.20, which checks the task definition rather than the image."
+  type        = string
+  default     = null
+}
+
 variable "container_image" {
   description = "Docker image for the Terrateam container."
   type        = string
