@@ -36,6 +36,12 @@ variable "enable_https" {
   default     = false
 }
 
+variable "container_user" {
+  description = "User the Terrateam container runs as (the task definition's `user`). Defaults to null, matching upstream: unset, so the image's own USER applies. Set it explicitly (e.g. \"terrat\", the image's non-root user) for Security Hub ECS.20, which checks the task definition rather than the image."
+  type        = string
+  default     = null
+}
+
 variable "container_image" {
   description = "Docker image for the Terrateam container."
   type        = string
@@ -84,6 +90,12 @@ variable "db_deletion_protection" {
   default     = true
 }
 
+variable "db_copy_tags_to_snapshot" {
+  description = "Copy the RDS instance's tags to its snapshots. Defaults to false, matching upstream."
+  type        = bool
+  default     = false
+}
+
 variable "db_backup_retention_period" {
   description = "Number of days to retain RDS automated backups."
   type        = number
@@ -94,6 +106,42 @@ variable "alb_ingress_cidr_blocks" {
   description = "CIDR blocks allowed to reach the ALB."
   type        = list(string)
   default     = ["0.0.0.0/0"]
+}
+
+variable "alb_drop_invalid_header_fields" {
+  description = "Have the ALB drop HTTP headers with invalid header fields instead of forwarding them. Defaults to false, matching upstream."
+  type        = bool
+  default     = false
+}
+
+variable "alb_access_logs_enabled" {
+  description = "Write ALB access logs to alb_access_logs_bucket. Defaults to false, matching upstream. Its own flag rather than inferred from alb_access_logs_bucket != null, for the same reason as enable_https: the bucket name may be unknown at plan time."
+  type        = bool
+  default     = false
+}
+
+variable "alb_access_logs_bucket" {
+  description = "S3 bucket for ALB access logs, used when alb_access_logs_enabled is true. Its policy must allow ELB log delivery before the ALB is updated, or AWS rejects the change."
+  type        = string
+  default     = null
+}
+
+variable "alb_access_logs_prefix" {
+  description = "Key prefix for ALB access logs in alb_access_logs_bucket."
+  type        = string
+  default     = null
+}
+
+variable "alb_http_listener" {
+  description = "Create the plain-HTTP listener on port 80 (a redirect to HTTPS when enable_https is true) and its security group rule. Defaults to true, matching upstream; set false to serve HTTPS only."
+  type        = bool
+  default     = true
+}
+
+variable "alb_deletion_protection" {
+  description = "Enable deletion protection on the ALB. Defaults to false, matching upstream."
+  type        = bool
+  default     = false
 }
 
 variable "extra_environment" {
@@ -115,6 +163,64 @@ variable "db_skip_final_snapshot" {
   description = "Skip final snapshot when destroying RDS. Use for testing only."
   type        = bool
   default     = false
+}
+
+variable "kms_key_id" {
+  description = "KMS key ARN for encrypting the RDS instance's storage and Performance Insights data. Defaults to the AWS-managed key (alias/aws/rds) when not set - pass a customer-managed key's ARN to use one instead."
+  type        = string
+  default     = null
+}
+
+variable "log_retention_in_days" {
+  description = "CloudWatch Logs retention (days) for the ECS task's log group."
+  type        = number
+  default     = 30
+}
+
+variable "db_parameters" {
+  description = "Extra parameters for the RDS instance's parameter group. Defaults to none, matching the engine family's default parameter group."
+  type = list(object({
+    name         = string
+    value        = string
+    apply_method = optional(string, "immediate")
+  }))
+  default = []
+}
+
+variable "db_storage_type" {
+  description = "RDS storage type."
+  type        = string
+  default     = "gp2"
+}
+
+variable "db_enabled_cloudwatch_logs_exports" {
+  description = "RDS log types to export to CloudWatch Logs (e.g. [\"postgresql\", \"upgrade\"]). Defaults to none."
+  type        = list(string)
+  default     = []
+}
+
+variable "db_performance_insights_retention_period" {
+  description = "Retention period (days) for RDS Performance Insights data. AWS default is 7; pass 465 (or higher, in 31-day increments) to use \"advanced\" database_insights_mode."
+  type        = number
+  default     = 7
+}
+
+variable "db_monitoring_interval" {
+  description = "Granularity (seconds) for RDS Enhanced Monitoring metrics. 0 disables enhanced monitoring, which is the default - the IAM role enhanced monitoring needs is only created when this is nonzero."
+  type        = number
+  default     = 0
+}
+
+variable "db_database_insights_mode" {
+  description = "RDS Performance Insights mode: \"standard\" (default) or \"advanced\". \"advanced\" requires db_performance_insights_retention_period >= 465."
+  type        = string
+  default     = "standard"
+}
+
+variable "db_log_retention_in_days" {
+  description = "CloudWatch Logs retention (days) for the RDS-specific log groups this module precreates (postgresql/upgrade exports, and RDSOSMetrics when enhanced monitoring is on). Only applies to log groups actually created - i.e. exports listed in db_enabled_cloudwatch_logs_exports, and RDSOSMetrics only when db_monitoring_interval > 0."
+  type        = number
+  default     = 30
 }
 
 variable "tags" {
