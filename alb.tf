@@ -4,7 +4,20 @@ resource "aws_lb" "this" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = var.public_subnet_ids
-  tags               = var.tags
+
+  enable_deletion_protection = var.alb_deletion_protection
+  drop_invalid_header_fields = var.alb_drop_invalid_header_fields
+
+  dynamic "access_logs" {
+    for_each = var.alb_access_logs_enabled ? [1] : []
+    content {
+      bucket  = var.alb_access_logs_bucket
+      prefix  = var.alb_access_logs_prefix
+      enabled = true
+    }
+  }
+
+  tags = var.tags
 }
 
 resource "aws_lb_target_group" "this" {
@@ -31,6 +44,8 @@ resource "aws_lb_target_group" "this" {
 # --- HTTP Listener ---
 
 resource "aws_lb_listener" "http" {
+  count = var.alb_http_listener ? 1 : 0
+
   load_balancer_arn = aws_lb.this.arn
   port              = 80
   protocol          = "HTTP"
@@ -51,6 +66,11 @@ resource "aws_lb_listener" "http" {
   }
 
   tags = var.tags
+}
+
+moved {
+  from = aws_lb_listener.http
+  to   = aws_lb_listener.http[0]
 }
 
 # --- HTTPS Listener (optional) ---

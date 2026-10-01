@@ -52,6 +52,7 @@ resource "aws_ecs_task_definition" "this" {
       name      = var.name
       image     = var.container_image
       essential = true
+      user      = var.container_user # null (unset) by default - see the variable
 
       portMappings = [
         {

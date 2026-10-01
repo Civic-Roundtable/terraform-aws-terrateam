@@ -12,6 +12,8 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group_rule" "alb_ingress_http" {
+  count = var.alb_http_listener ? 1 : 0
+
   security_group_id = aws_security_group.alb.id
   type              = "ingress"
   from_port         = 80
@@ -19,6 +21,11 @@ resource "aws_security_group_rule" "alb_ingress_http" {
   protocol          = "tcp"
   cidr_blocks       = var.alb_ingress_cidr_blocks
   description       = "HTTP"
+}
+
+moved {
+  from = aws_security_group_rule.alb_ingress_http
+  to   = aws_security_group_rule.alb_ingress_http[0]
 }
 
 resource "aws_security_group_rule" "alb_ingress_https" {
